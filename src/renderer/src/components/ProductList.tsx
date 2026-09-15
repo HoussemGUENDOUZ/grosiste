@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Product } from '../../../shared/types/product';
 import { isLowStock } from '../utils/stock';
 
@@ -9,12 +10,27 @@ interface ProductListProps {
 }
 
 export function ProductList({ products, onEdit, onDelete, onAddClick }: ProductListProps) {
+  const [search, setSearch] = useState('');
+
+  const filtered = products.filter((p) =>
+    p.name.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
         <h2>Products</h2>
         <button onClick={onAddClick}>+ Add Product</button>
       </div>
+
+      <input
+        type="text"
+        placeholder="Search by name..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{ marginBottom: 12, padding: 6, width: '100%', maxWidth: 300 }}
+      />
+
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
@@ -24,7 +40,7 @@ export function ProductList({ products, onEdit, onDelete, onAddClick }: ProductL
           </tr>
         </thead>
         <tbody>
-          {products.map((p) => (
+          {filtered.map((p) => (
             <tr key={p.id} style={{ background: isLowStock(p) ? '#fff3cd' : undefined }}>
               <td>{p.name}</td>
               <td>
@@ -38,6 +54,8 @@ export function ProductList({ products, onEdit, onDelete, onAddClick }: ProductL
           ))}
         </tbody>
       </table>
+
+      {filtered.length === 0 && <p>No products match "{search}".</p>}
     </div>
   );
 }
