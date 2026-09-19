@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { initSchema } from './db/schema'
 import { registerProductHandlers } from './ipc/productHandlers'
 import { registerClientHandlers } from './ipc/clientHandlers';
+import { registerSaleHandlers } from './ipc/saleHandlers';
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -44,6 +45,7 @@ app.whenReady().then(() => {
   initSchema()
   registerProductHandlers()
   registerClientHandlers()
+  registerSaleHandlers()
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 

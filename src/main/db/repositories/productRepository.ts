@@ -15,14 +15,15 @@ function toProduct(row: any): Product {
     weightPerCartonKg: row.weight_per_carton_kg,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    archived: !!row.archived
   };
 }
 
 export const productRepository = {
   getAll(): Product[] {
-    const rows = db.prepare('SELECT * FROM product ORDER BY name').all();
-    return rows.map(toProduct);
-  },
+  const rows = db.prepare('SELECT * FROM product WHERE archived = 0 ORDER BY name').all();
+  return rows.map(toProduct);
+},
 
   getById(id: number): Product | null {
     const row = db.prepare('SELECT * FROM product WHERE id = ?').get(id);
@@ -53,7 +54,14 @@ export const productRepository = {
     return this.getById(id)!;
   },
 
-  delete(id: number): void {
+  delete(id: number): 'archived' | 'deleted' {
+  const hasSales = db.prepare('SELECT 1 FROM sale_item WHERE product_id = ? LIMIT 1').get(id);
+  if (hasSales) {
+    db.prepare('UPDATE product SET archived = 1, updated_at = datetime(\'now\') WHERE id = ?').run(id);
+    return 'archived';
+  } else {
     db.prepare('DELETE FROM product WHERE id = ?').run(id);
-  },
+    return 'deleted';
+  }
+}
 };

@@ -10,6 +10,7 @@ export interface Product {
   weightPerCartonKg: string | null
   createdAt: string
   updatedAt: string
+  archived: boolean
 }
 
 export type NewProduct = Omit<Product, 'id' | 'createdAt' | 'updatedAt'>
